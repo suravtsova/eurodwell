@@ -1,0 +1,14 @@
+{
+  "config": {
+    "assetsBaseUrl": "https://raw.githubusercontent.com/suravtsova/eurodwell/main/"
+  },
+  "employees": [
+    {
+      "id": "mary-jaszczak",
+      "name": "Mary Jaszczak",
+      "title": "Head of Estimation Department",
+      "phone": "123-456-7890",
+      "photo": "assets/photos/mary-jaszczak.png"
+    }
+  ]
+}
