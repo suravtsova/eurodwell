@@ -5,6 +5,9 @@
  *   node build.js           — картинки по адресу config.assetsBaseUrl (для отправки писем)
  *   node build.js --local   — картинки из локальной папки (только для предпросмотра)
  *
+ * Стиль задаётся в employees.json: config.variant ("modern" или "classic"),
+ * при необходимости — отдельно для сотрудника полем "variant".
+ *
  * Результат: dist/<id>.html — по файлу на сотрудника, dist/index.html — общий список.
  */
 const fs = require('fs');
@@ -29,7 +32,7 @@ ${body}
 const links = [];
 for (const emp of data.employees) {
   if (!emp.id) throw new Error(`У сотрудника "${emp.name}" не указан id`);
-  const html = render(emp, config);
+  const html = render(emp, { ...config, variant: emp.variant || config.variant });
   fs.writeFileSync(path.join(outDir, `${emp.id}.html`), page(`Signature — ${emp.name}`, html));
   fs.writeFileSync(path.join(outDir, `${emp.id}.snippet.html`), html + '\n');
   links.push(`<h3 style="font-family:Arial,sans-serif;"><a href="${emp.id}.html">${emp.name}</a></h3>${html}<hr style="margin:32px 0;">`);

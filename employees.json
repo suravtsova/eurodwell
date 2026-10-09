@@ -1,6 +1,7 @@
 {
   "config": {
-    "assetsBaseUrl": "https://raw.githubusercontent.com/suravtsova/eurodwell/main/"
+    "assetsBaseUrl": "https://raw.githubusercontent.com/suravtsova/eurodwell/main/",
+    "variant": "modern"
   },
   "employees": [
     {

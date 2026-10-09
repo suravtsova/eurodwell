@@ -19,6 +19,10 @@
     website: 'www.eurodwell.com',
     facebook: 'https://www.facebook.com/eurodwell',
     instagram: 'https://www.instagram.com/eurodwell',
+    // Только для современного варианта:
+    cta: 'Get a free estimate',
+    ctaUrl: '',
+    tagline: '', // короткий слоган справа от логотипа, например 'European quality since 2010'
   };
 
   function esc(s) {
@@ -66,17 +70,8 @@
     );
   }
 
-  /**
-   * @param {object} emp     данные сотрудника (см. employees.json)
-   * @param {object} config  { assetsBaseUrl } — где лежат картинки
-   * @returns {string} HTML подписи
-   */
-  function render(emp, config) {
-    var e = {};
-    Object.keys(DEFAULTS).forEach(function (k) { e[k] = DEFAULTS[k]; });
-    // Не указанное поле берётся из DEFAULTS, пустая строка — скрывает строку.
-    Object.keys(emp || {}).forEach(function (k) { if (emp[k] != null) e[k] = String(emp[k]).trim(); });
-    var base = (config && config.assetsBaseUrl) || '';
+  // Классический вариант — как в исходном макете.
+  function renderClassic(e, base) {
 
     var rows = '';
     if (e.phone) {
@@ -126,5 +121,126 @@
     );
   }
 
-  return { render: render, DEFAULTS: DEFAULTS };
+  // ---------------------------------------------------------------------------
+  // Современный вариант: компактнее, больше воздуха, акцентная полоса,
+  // должность капсом с разрядкой, кнопка-призыв и тёмные круглые соцсети.
+  // ---------------------------------------------------------------------------
+  var INK = '#1A1A1A';
+  var MUTED = '#6B6B6B';
+  var HAIR = '#E6E6E6';
+
+  function modernContact(icon, content, base) {
+    return (
+      '<td valign="middle" style="padding:0 6px 0 0;">' +
+      '<img src="' + esc(asset('assets/icons/' + icon + '.png', base)) + '" width="14" height="14" alt="" style="display:block;border:0;width:14px;height:14px;">' +
+      '</td>' +
+      '<td valign="middle" style="padding:0 16px 0 0;font-family:' + FONT + ';font-size:13px;line-height:18px;color:' + INK + ';white-space:nowrap;">' +
+      content +
+      '</td>'
+    );
+  }
+
+  function plainLink(href, text, color) {
+    return '<a href="' + esc(href) + '" target="_blank" style="color:' + (color || INK) + ';text-decoration:none;">' + esc(text) + '</a>';
+  }
+
+  function contactLine(cells) {
+    return cells
+      ? '<tr><td style="padding:0 0 6px 0;"><table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;"><tr>' + cells + '</tr></table></td></tr>'
+      : '';
+  }
+
+  function renderModern(e, base) {
+    var site = e.website ? withProtocol(e.website) : '';
+
+    var line1 = '';
+    if (e.phone) {
+      line1 += modernContact('phone', plainLink('tel:' + String(e.phone).replace(/[^\d+]/g, ''), e.phone), base);
+    }
+    if (e.website) {
+      line1 += modernContact('website', plainLink(site, e.website.replace(/^https?:\/\//i, '').replace(/^www\./i, '')), base);
+    }
+    var line2 = '';
+    if (e.address) {
+      var mapUrl = e.addressUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.address);
+      line2 += modernContact('location', plainLink(mapUrl, e.address, MUTED), base);
+    }
+
+    var cta = '';
+    if (e.cta) {
+      cta =
+        '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:separate;"><tr>' +
+        '<td bgcolor="' + RED + '" style="background-color:' + RED + ';border-radius:4px;padding:8px 16px;">' +
+        '<a href="' + esc(e.ctaUrl ? withProtocol(e.ctaUrl) : site) + '" target="_blank" style="font-family:' + FONT + ';font-size:12px;line-height:14px;font-weight:bold;letter-spacing:0.6px;color:#ffffff;text-decoration:none;white-space:nowrap;">' +
+        esc(e.cta).toUpperCase() + ' &rarr;</a>' +
+        '</td></tr></table>';
+    }
+
+    var social = '';
+    if (e.facebook) social += socialRound(e.facebook, 'facebook-round', 'Facebook', base);
+    if (e.instagram) social += socialRound(e.instagram, 'instagram-round', 'Instagram', base);
+
+    return (
+      '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + FONT + ';">' +
+      '<tr>' +
+      // Фото
+      (e.photo
+        ? '<td valign="top" width="112" style="padding:2px 20px 0 0;width:112px;">' +
+          '<img src="' + esc(asset(e.photo, base)) + '" width="112" height="112" alt="' + esc(e.name) + '" style="display:block;border:0;width:112px;height:112px;border-radius:50%;">' +
+          '</td>'
+        : '') +
+      // Акцентная полоса
+      '<td width="3" bgcolor="' + RED + '" style="width:3px;background-color:' + RED + ';font-size:1px;line-height:1px;">&nbsp;</td>' +
+      // Текст
+      '<td valign="top" style="padding:0 0 0 20px;">' +
+      '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">' +
+      '<tr><td style="font-family:' + FONT + ';font-size:22px;line-height:26px;font-weight:bold;color:' + INK + ';letter-spacing:-0.3px;">' + esc(e.name) + '</td></tr>' +
+      '<tr><td style="font-family:' + FONT + ';font-size:11px;line-height:16px;font-weight:bold;color:' + RED + ';letter-spacing:1.6px;text-transform:uppercase;padding:4px 0 14px 0;">' + esc(e.title).toUpperCase() + '</td></tr>' +
+      contactLine(line1) +
+      contactLine(line2) +
+      (cta ? '<tr><td style="padding:8px 0 0 0;">' + cta + '</td></tr>' : '') +
+      '</table>' +
+      '</td>' +
+      '</tr>' +
+      // Нижняя строка: тонкая линия, логотип, слоган и соцсети
+      '<tr><td colspan="3" style="padding:18px 0 0 0;">' +
+      '<table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse;border-top:1px solid ' + HAIR + ';"><tr>' +
+      '<td valign="middle" style="padding:12px 0 0 0;font-family:' + FONT + ';font-size:20px;line-height:22px;font-weight:bold;color:' + INK + ';white-space:nowrap;letter-spacing:-0.3px;">' +
+      '<a href="' + esc(site || withProtocol(DEFAULTS.website)) + '" target="_blank" style="color:' + INK + ';text-decoration:none;"><span style="color:' + RED + ';">E</span>uroDwell</a>' +
+      '</td>' +
+      (e.tagline
+        ? '<td valign="middle" style="padding:12px 0 0 14px;font-family:' + FONT + ';font-size:11px;line-height:14px;color:' + MUTED + ';letter-spacing:0.4px;white-space:nowrap;">' + esc(e.tagline) + '</td>'
+        : '') +
+      '<td valign="middle" align="right" style="padding:12px 0 0 16px;white-space:nowrap;">' + social + '</td>' +
+      '</tr></table>' +
+      '</td></tr>' +
+      '</table>'
+    );
+  }
+
+  function socialRound(href, icon, alt, base) {
+    return (
+      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;text-decoration:none;margin-left:6px;">' +
+      '<img src="' + esc(asset('assets/icons/' + icon + '.png', base)) + '" width="28" height="28" alt="' + alt + '" style="display:inline-block;border:0;width:28px;height:28px;vertical-align:middle;">' +
+      '</a>'
+    );
+  }
+
+  var VARIANTS = { classic: renderClassic, modern: renderModern };
+
+  /**
+   * @param {object} emp     данные сотрудника (см. employees.json)
+   * @param {object} config  { assetsBaseUrl, variant: 'classic' | 'modern' }
+   * @returns {string} HTML подписи
+   */
+  function render(emp, config) {
+    var e = {};
+    Object.keys(DEFAULTS).forEach(function (k) { e[k] = DEFAULTS[k]; });
+    // Не указанное поле берётся из DEFAULTS, пустая строка — скрывает строку.
+    Object.keys(emp || {}).forEach(function (k) { if (emp[k] != null) e[k] = String(emp[k]).trim(); });
+    var variant = VARIANTS[(config && config.variant) || 'classic'] || renderClassic;
+    return variant(e, (config && config.assetsBaseUrl) || '');
+  }
+
+  return { render: render, DEFAULTS: DEFAULTS, VARIANTS: Object.keys(VARIANTS) };
 });

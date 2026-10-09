@@ -16,7 +16,7 @@
   .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
   .card h2 { margin: 0 0 14px; font-size: 16px; }
   label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
-  input[type=text], input[type=url], input[type=tel] { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+  input[type=text], input[type=url], input[type=tel], select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
   input:focus { outline: 2px solid var(--red); outline-offset: -1px; }
   .hint { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
@@ -37,6 +37,12 @@
   <section class="card">
     <h2>Данные сотрудника</h2>
     <form id="form" autocomplete="off">
+      <label for="variant">Стиль подписи</label>
+      <select id="variant">
+        <option value="modern" selected>Современный</option>
+        <option value="classic">Классический (исходный макет)</option>
+      </select>
+
       <label for="name">Имя и фамилия</label>
       <input type="text" id="name" value="Mary Jaszczak">
 
@@ -66,6 +72,18 @@
 
       <label for="instagram">Instagram</label>
       <input type="url" id="instagram">
+
+      <div id="modernFields">
+        <label for="cta">Текст кнопки</label>
+        <input type="text" id="cta">
+        <div class="hint">Оставьте пустым, чтобы убрать кнопку.</div>
+
+        <label for="ctaUrl">Ссылка кнопки</label>
+        <input type="url" id="ctaUrl" placeholder="по умолчанию — сайт">
+
+        <label for="tagline">Слоган рядом с логотипом</label>
+        <input type="text" id="tagline" placeholder="необязательно">
+      </div>
 
       <label for="assetsBaseUrl">Где лежат картинки (базовый URL)</label>
       <input type="url" id="assetsBaseUrl" value="https://raw.githubusercontent.com/suravtsova/eurodwell/main/">
@@ -109,10 +127,10 @@
   (function () {
     var S = window.EuroDwellSignature;
     var $ = function (id) { return document.getElementById(id); };
-    var fields = ['name', 'title', 'phone', 'photo', 'address', 'website', 'facebook', 'instagram'];
+    var fields = ['name', 'title', 'phone', 'photo', 'address', 'website', 'facebook', 'instagram', 'cta', 'ctaUrl', 'tagline'];
     var croppedPhoto = null;
 
-    ['address', 'website', 'facebook', 'instagram'].forEach(function (k) { $(k).value = S.DEFAULTS[k]; });
+    ['address', 'website', 'facebook', 'instagram', 'cta', 'ctaUrl', 'tagline'].forEach(function (k) { $(k).value = S.DEFAULTS[k]; });
 
     function data() {
       var e = {};
@@ -121,7 +139,9 @@
     }
 
     function update() {
-      var html = S.render(data(), { assetsBaseUrl: $('assetsBaseUrl').value.trim() });
+      var variant = $('variant').value;
+      $('modernFields').style.display = variant === 'modern' ? '' : 'none';
+      var html = S.render(data(), { assetsBaseUrl: $('assetsBaseUrl').value.trim(), variant: variant });
       $('preview').innerHTML = html;
       $('code').value = html;
       $('dataUrlWarn').style.display = /^data:/.test($('photo').value) ? 'block' : 'none';
@@ -146,6 +166,7 @@
     }
 
     $('form').addEventListener('input', update);
+    $('form').addEventListener('change', update);
 
     // Копирование как форматированный текст — для вставки в Gmail/Outlook.
     $('copyRich').addEventListener('click', function () {
