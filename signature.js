@@ -20,8 +20,6 @@
     facebook: 'https://www.facebook.com/eurodwell',
     instagram: 'https://www.instagram.com/eurodwell',
     // Только для современного варианта:
-    cta: 'Get a free estimate',
-    ctaUrl: '',
     tagline: '', // короткий слоган справа от логотипа, например 'European quality since 2010'
   };
 
@@ -123,7 +121,7 @@
 
   // ---------------------------------------------------------------------------
   // Современный вариант: компактнее, больше воздуха, акцентная полоса,
-  // должность капсом с разрядкой, кнопка-призыв и тёмные круглые соцсети.
+  // должность капсом с разрядкой и тёмные круглые соцсети.
   // ---------------------------------------------------------------------------
   var INK = '#1A1A1A';
   var MUTED = '#6B6B6B';
@@ -166,16 +164,6 @@
       line2 += modernContact('location', plainLink(mapUrl, e.address, MUTED), base);
     }
 
-    var cta = '';
-    if (e.cta) {
-      cta =
-        '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:separate;"><tr>' +
-        '<td bgcolor="' + RED + '" style="background-color:' + RED + ';border-radius:4px;padding:8px 16px;">' +
-        '<a href="' + esc(e.ctaUrl ? withProtocol(e.ctaUrl) : site) + '" target="_blank" style="font-family:' + FONT + ';font-size:12px;line-height:14px;font-weight:bold;letter-spacing:0.6px;color:#ffffff;text-decoration:none;white-space:nowrap;">' +
-        esc(e.cta).toUpperCase() + ' &rarr;</a>' +
-        '</td></tr></table>';
-    }
-
     var social = '';
     if (e.facebook) social += socialRound(e.facebook, 'facebook-round', 'Facebook', base);
     if (e.instagram) social += socialRound(e.instagram, 'instagram-round', 'Instagram', base);
@@ -198,7 +186,6 @@
       '<tr><td style="font-family:' + FONT + ';font-size:11px;line-height:16px;font-weight:bold;color:' + RED + ';letter-spacing:1.6px;text-transform:uppercase;padding:4px 0 14px 0;">' + esc(e.title).toUpperCase() + '</td></tr>' +
       contactLine(line1) +
       contactLine(line2) +
-      (cta ? '<tr><td style="padding:8px 0 0 0;">' + cta + '</td></tr>' : '') +
       '</table>' +
       '</td>' +
       '</tr>' +
