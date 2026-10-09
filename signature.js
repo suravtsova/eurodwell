@@ -142,9 +142,9 @@
     return '<a href="' + esc(href) + '" target="_blank" style="color:' + (color || INK) + ';text-decoration:none;">' + esc(text) + '</a>';
   }
 
-  function contactLine(cells) {
+  function contactLine(cells, isLast) {
     return cells
-      ? '<tr><td style="padding:0 0 6px 0;"><table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;"><tr>' + cells + '</tr></table></td></tr>'
+      ? '<tr><td style="padding:0 0 ' + (isLast ? 0 : 6) + 'px 0;"><table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;"><tr>' + cells + '</tr></table></td></tr>'
       : '';
   }
 
@@ -173,19 +173,19 @@
       '<tr>' +
       // Фото
       (e.photo
-        ? '<td valign="top" width="112" style="padding:2px 20px 0 0;width:112px;">' +
+        ? '<td valign="middle" width="112" style="padding:0 20px 0 0;width:112px;">' +
           '<img src="' + esc(asset(e.photo, base)) + '" width="112" height="112" alt="' + esc(e.name) + '" style="display:block;border:0;width:112px;height:112px;border-radius:50%;">' +
           '</td>'
         : '') +
       // Акцентная полоса
       '<td width="3" bgcolor="' + RED + '" style="width:3px;background-color:' + RED + ';font-size:1px;line-height:1px;">&nbsp;</td>' +
       // Текст
-      '<td valign="top" style="padding:0 0 0 20px;">' +
+      '<td valign="middle" style="padding:0 0 0 20px;">' +
       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">' +
       '<tr><td style="font-family:' + FONT + ';font-size:22px;line-height:26px;font-weight:bold;color:' + INK + ';letter-spacing:-0.3px;">' + esc(e.name) + '</td></tr>' +
       '<tr><td style="font-family:' + FONT + ';font-size:11px;line-height:16px;font-weight:bold;color:' + RED + ';letter-spacing:1.6px;text-transform:uppercase;padding:4px 0 14px 0;">' + esc(e.title).toUpperCase() + '</td></tr>' +
-      contactLine(line1) +
-      contactLine(line2) +
+      contactLine(line1, !line2) +
+      contactLine(line2, true) +
       '</table>' +
       '</td>' +
       '</tr>' +
