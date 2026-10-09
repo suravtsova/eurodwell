@@ -54,11 +54,11 @@
 
       <label for="photo">Ссылка на фото</label>
       <input type="url" id="photo" value="assets/photos/mary-jaszczak.png">
-      <div class="hint">Полный URL (https://…) или путь внутри репозитория (assets/photos/…).</div>
+      <div class="hint">Полный URL (https://…) или путь на сайте подписей (assets/photos/&lt;id&gt;.png).</div>
 
       <label for="photoFile">…или загрузите фото, чтобы обрезать его в круг</label>
       <input type="file" id="photoFile" accept="image/*">
-      <div class="hint">Фото будет обрезано по центру в круг 300×300. Нажмите «Скачать круглое фото», положите файл в <code>assets/photos/</code> (или на сайт) и вставьте ссылку выше.</div>
+      <div class="hint">Фото будет обрезано по центру в круг 300×300 — только для этой страницы. Для постоянной подписи загрузите исходное фото в папку <code>photos/</code> на GitHub (см. README) — сайт обрежет его сам.</div>
       <div class="warn" id="dataUrlWarn">Сейчас фото встроено прямо в подпись (data URL) — так удобно для предпросмотра, но Gmail и Outlook такие картинки часто не показывают. Загрузите файл на хостинг и укажите ссылку.</div>
 
       <label for="address">Адрес</label>
@@ -79,7 +79,7 @@
       </div>
 
       <label for="assetsBaseUrl">Где лежат картинки (базовый URL)</label>
-      <input type="url" id="assetsBaseUrl" value="https://raw.githubusercontent.com/suravtsova/eurodwell/main/">
+      <input type="url" id="assetsBaseUrl" value="https://suravtsova.github.io/eurodwell/">
       <div class="hint">К этому адресу добавляются относительные пути иконок и фото. Должен открываться публично.</div>
     </form>
   </section>

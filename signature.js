@@ -37,7 +37,8 @@
   function asset(path, baseUrl) {
     if (!path) return '';
     if (/^(https?:|data:)/i.test(path)) return path;
-    return (baseUrl || '').replace(/\/?$/, '/') + path.replace(/^\.?\//, '');
+    path = path.replace(/^\.?\//, '');
+    return baseUrl ? baseUrl.replace(/\/?$/, '/') + path : path;
   }
 
   function withProtocol(url) {
