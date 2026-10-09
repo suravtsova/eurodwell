@@ -38,12 +38,13 @@ for (const f of ['signature.js', 'generator.html']) fs.copyFileSync(path.join(RO
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-// Фото: явная ссылка из employees.json или круглое фото, сделанное из photos/<id>.*
+// Фото: явная ссылка из employees.json, круглое фото из photos/<id>.* или,
+// если фото нет (или указано "photo": ""), логотип на его месте.
 function photoFor(emp) {
-  if (emp.photo) return emp.photo;
+  if (emp.photo != null) return emp.photo;
   const p = `assets/photos/${emp.id}.png`;
   if (fs.existsSync(path.join(OUT, p))) return p;
-  console.warn(`⚠ Нет фото для "${emp.id}": загрузите photos/${emp.id}.jpg`);
+  console.log(`ℹ ${emp.id}: фото нет — вместо него будет логотип`);
   return '';
 }
 

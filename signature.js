@@ -90,15 +90,18 @@
     if (e.facebook) social += socialIcon(e.facebook, 'facebook', 'Facebook', base);
     if (e.instagram) social += socialIcon(e.instagram, 'instagram', 'Instagram', base);
 
+    var logo = '<a href="' + esc(withProtocol(e.website || DEFAULTS.website)) + '" target="_blank" style="color:#000000;text-decoration:none;"><span style="color:' + RED + ';">E</span>uroDwell</a>';
+    var logoStyle = 'padding:6px 22px 0 0;font-family:' + FONT + ';font-size:34px;line-height:38px;font-weight:bold;color:#000000;white-space:nowrap;letter-spacing:-0.5px;';
+
     return (
       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + FONT + ';">' +
       '<tr>' +
-      // Фото
-      '<td valign="top" width="150" style="padding:0 22px 0 0;width:150px;">' +
+      // Фото, а если его нет — логотип
       (e.photo
-        ? '<img src="' + esc(asset(e.photo, base)) + '" width="150" height="150" alt="' + esc(e.name) + '" style="display:block;border:0;width:150px;height:150px;border-radius:50%;">'
-        : '') +
-      '</td>' +
+        ? '<td valign="top" width="150" style="padding:0 22px 0 0;width:150px;">' +
+          '<img src="' + esc(asset(e.photo, base)) + '" width="150" height="150" alt="' + esc(e.name) + '" style="display:block;border:0;width:150px;height:150px;border-radius:50%;">' +
+          '</td>'
+        : '<td valign="middle" style="' + logoStyle + '">' + logo + '</td>') +
       // Имя, должность, контакты
       '<td valign="top" style="padding:0;">' +
       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">' +
@@ -109,11 +112,9 @@
       '</table>' +
       '</td>' +
       '</tr>' +
-      // Логотип + соцсети
+      // Логотип (если его не показали вместо фото) + соцсети
       '<tr>' +
-      '<td valign="middle" style="padding:6px 22px 0 0;font-family:' + FONT + ';font-size:34px;line-height:38px;font-weight:bold;color:#000000;white-space:nowrap;letter-spacing:-0.5px;">' +
-      '<a href="' + esc(withProtocol(e.website || DEFAULTS.website)) + '" target="_blank" style="color:#000000;text-decoration:none;"><span style="color:' + RED + ';">E</span>uroDwell</a>' +
-      '</td>' +
+      (e.photo ? '<td valign="middle" style="' + logoStyle + '">' + logo + '</td>' : '<td></td>') +
       '<td valign="middle" style="padding:6px 0 0 0;">' + social + '</td>' +
       '</tr>' +
       '</table>'
@@ -165,23 +166,51 @@
       line2 += modernContact('location', plainLink(mapUrl, e.address, MUTED), base);
     }
 
+    var logoLink = '<a href="' + esc(site || withProtocol(DEFAULTS.website)) + '" target="_blank" style="color:' + INK + ';text-decoration:none;"><span style="color:' + RED + ';">E</span>uroDwell</a>';
+    var hasPhoto = !!e.photo;
+
     var social = '';
-    if (e.facebook) social += socialRound(e.facebook, 'facebook-round', 'Facebook', base);
-    if (e.instagram) social += socialRound(e.instagram, 'instagram-round', 'Instagram', base);
+    if (e.facebook) social += socialRound(e.facebook, 'facebook-round', 'Facebook', base, hasPhoto ? '0 0 0 6px' : '0 6px 0 0');
+    if (e.instagram) social += socialRound(e.instagram, 'instagram-round', 'Instagram', base, hasPhoto ? '0 0 0 6px' : '0 6px 0 0');
+
+    var tagline = e.tagline
+      ? '<td valign="middle" style="padding:12px 0 0 14px;font-family:' + FONT + ';font-size:11px;line-height:14px;color:' + MUTED + ';letter-spacing:0.4px;white-space:nowrap;">' + esc(e.tagline) + '</td>'
+      : '';
+
+    // Левая колонка: круглое фото или, если фото нет, логотип с соцсетями под ним.
+    var left = hasPhoto
+      ? '<td valign="middle" width="112" style="padding:0 20px 0 0;width:112px;">' +
+        '<img src="' + esc(asset(e.photo, base)) + '" width="112" height="112" alt="' + esc(e.name) + '" style="display:block;border:0;width:112px;height:112px;border-radius:50%;">' +
+        '</td>'
+      : '<td valign="middle" style="padding:0 22px 0 0;">' +
+        '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">' +
+        '<tr><td style="font-family:' + FONT + ';font-size:30px;line-height:34px;font-weight:bold;color:' + INK + ';white-space:nowrap;letter-spacing:-0.5px;">' + logoLink + '</td></tr>' +
+        (e.tagline
+          ? '<tr><td style="padding:4px 0 0 0;font-family:' + FONT + ';font-size:11px;line-height:14px;color:' + MUTED + ';letter-spacing:0.4px;">' + esc(e.tagline) + '</td></tr>'
+          : '') +
+        (social ? '<tr><td style="padding:12px 0 0 0;white-space:nowrap;">' + social + '</td></tr>' : '') +
+        '</table>' +
+        '</td>';
+
+    // Нижняя строка (только с фото): тонкая линия, логотип, слоган и соцсети.
+    var footer = hasPhoto
+      ? '<tr><td colspan="3" style="padding:18px 0 0 0;">' +
+        '<table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse;border-top:1px solid ' + HAIR + ';"><tr>' +
+        '<td valign="middle" style="padding:12px 0 0 0;font-family:' + FONT + ';font-size:20px;line-height:22px;font-weight:bold;color:' + INK + ';white-space:nowrap;letter-spacing:-0.3px;">' + logoLink + '</td>' +
+        tagline +
+        '<td valign="middle" align="right" style="padding:12px 0 0 16px;white-space:nowrap;">' + social + '</td>' +
+        '</tr></table>' +
+        '</td></tr>'
+      : '';
 
     return (
       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + FONT + ';">' +
       '<tr>' +
-      // Фото
-      (e.photo
-        ? '<td valign="middle" width="112" style="padding:0 20px 0 0;width:112px;">' +
-          '<img src="' + esc(asset(e.photo, base)) + '" width="112" height="112" alt="' + esc(e.name) + '" style="display:block;border:0;width:112px;height:112px;border-radius:50%;">' +
-          '</td>'
-        : '') +
+      left +
       // Акцентная полоса
       '<td width="3" bgcolor="' + RED + '" style="width:3px;background-color:' + RED + ';font-size:1px;line-height:1px;">&nbsp;</td>' +
       // Текст
-      '<td valign="middle" style="padding:0 0 0 20px;">' +
+      '<td valign="middle" style="padding:' + (hasPhoto ? '0' : '4px') + ' 0 ' + (hasPhoto ? '0' : '4px') + ' 20px;">' +
       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">' +
       '<tr><td style="font-family:' + FONT + ';font-size:22px;line-height:26px;font-weight:bold;color:' + INK + ';letter-spacing:-0.3px;">' + esc(e.name) + '</td></tr>' +
       '<tr><td style="font-family:' + FONT + ';font-size:11px;line-height:16px;font-weight:bold;color:' + RED + ';letter-spacing:1.6px;text-transform:uppercase;padding:4px 0 14px 0;">' + esc(e.title).toUpperCase() + '</td></tr>' +
@@ -190,25 +219,14 @@
       '</table>' +
       '</td>' +
       '</tr>' +
-      // Нижняя строка: тонкая линия, логотип, слоган и соцсети
-      '<tr><td colspan="3" style="padding:18px 0 0 0;">' +
-      '<table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse;border-top:1px solid ' + HAIR + ';"><tr>' +
-      '<td valign="middle" style="padding:12px 0 0 0;font-family:' + FONT + ';font-size:20px;line-height:22px;font-weight:bold;color:' + INK + ';white-space:nowrap;letter-spacing:-0.3px;">' +
-      '<a href="' + esc(site || withProtocol(DEFAULTS.website)) + '" target="_blank" style="color:' + INK + ';text-decoration:none;"><span style="color:' + RED + ';">E</span>uroDwell</a>' +
-      '</td>' +
-      (e.tagline
-        ? '<td valign="middle" style="padding:12px 0 0 14px;font-family:' + FONT + ';font-size:11px;line-height:14px;color:' + MUTED + ';letter-spacing:0.4px;white-space:nowrap;">' + esc(e.tagline) + '</td>'
-        : '') +
-      '<td valign="middle" align="right" style="padding:12px 0 0 16px;white-space:nowrap;">' + social + '</td>' +
-      '</tr></table>' +
-      '</td></tr>' +
+      footer +
       '</table>'
     );
   }
 
-  function socialRound(href, icon, alt, base) {
+  function socialRound(href, icon, alt, base, margin) {
     return (
-      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;text-decoration:none;margin-left:6px;">' +
+      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;text-decoration:none;margin:' + margin + ';">' +
       '<img src="' + esc(asset('assets/icons/' + icon + '.png', base)) + '" width="28" height="28" alt="' + alt + '" style="display:inline-block;border:0;width:28px;height:28px;vertical-align:middle;">' +
       '</a>'
     );
